@@ -1,3 +1,108 @@
 #app-login-btn {
   width: 160px;
 }
+
+
+#Backlog {
+  width: 160px;
+}
+
+.kanban-column {
+  padding: 20px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  transition: border 0.2s ease, background-color 0.2s ease;
+  word-wrap: break-word; /*Перенос текста в блоках*/
+  box-shadow: 3px 0px 2px 0 rgba(0, 0, 0, 0.14), 
+               0 3px 1px -2px rgba(0, 0, 0, 0.2), 
+               0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  max-height: calc(80vh - 100px);
+  overflow-y: auto;
+}
+
+.kanban-column.over {
+  border: 2px dashed #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.list-group-item.draggable {
+  cursor: grab;
+  transition: opacity 0.2s ease;
+}
+
+.list-group-item.dragging {
+  opacity: 0.5;
+}
+
+.drop-target {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; /* Прозрачность для событий */
+}
+
+/* Панель пользователя */
+/* Аватар */
+.avatar {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+/* Стрелочка */
+.arrow {
+  transition: transform 0.2s ease;
+}
+/* Стрелочка */
+#menu-arrow {
+  transition: transform 0.2s ease;
+}
+
+/* #user-menu-button[aria-expanded="true"] #menu-arrow {
+  transform: rotate(180deg);  Поворачиваем стрелочку вверх 
+} */
+
+/* Когда меню открыто */
+#user-menu-container.open #menu-arrow {
+  transform: rotate(180deg); /* Поворачиваем стрелочку на 180 градусов */
+}
+.dropdown.open .arrow {
+  transform: rotate(180deg); /* Поворачиваем стрелочку вверх */
+}
+
+/* Меню */
+#user-menu {
+  min-width: 150px;
+}
+
+#user-menu li a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #343a40;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+#user-menu li a:hover {
+  background-color: #f8f9fa; /* Выделение при hover */
+  color: #007bff;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .col-md-3 {
+      flex: 0 0 auto;
+      width: 24%;
+  }
+}
+
+
+
+/* Если dropdown открыт */
+#user-menu-button.show::after { 
+  transform: rotate(180deg);
+}

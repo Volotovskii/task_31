@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 
 export class BaseModel {
-  constructor() {
-    this.id = uuid();
+  constructor(id = null) {
+    this.id = id || uuid();   // если id нету (новый)
   }
 }

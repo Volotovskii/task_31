@@ -1,1 +1,40 @@
 <h1>Your tasks here</h1>
+<div class="container mt-5">
+  <div class="row">
+    <!-- Backlog -->
+    <div class="col-md-3 kanban-column" data-status="backlog">
+      <h4>Backlog</h4>
+      <div id="backlog-list" class="list-group"></div>
+      <button id="add-backlog-card" class="btn btn-primary btn-block">+ Add card</button>
+    </div>
+
+    <!-- Ready -->
+    <div class="col-md-3 kanban-column" data-status="ready">
+      <h4>Ready</h4>
+      <div id="ready-list" class="list-group"></div>
+      <button id="add-ready-card" class="btn btn-primary btn-block">+ Add card</button>
+    </div>
+
+    <!-- In Progress -->
+    <div class="col-md-3 kanban-column" data-status="in-progress">
+      <h4>In Progress</h4>
+      <div id="in-progress-list" class="list-group"></div>
+      <button id="add-in-progress-card" class="btn btn-primary btn-block">+ Add card</button>
+    </div>
+
+    <!-- Finished -->
+    <div class="col-md-3 kanban-column" data-status="finished">
+      <h4>Finished</h4>
+      <div id="finished-list" class="list-group"></div>
+      <button id="add-finished-card" class="btn btn-primary btn-block">+ Add card</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-5">
+    <div class="alert alert-info">
+      Active tasks: <span id="active-tasks-count">0</span> |
+      Finished tasks: <span id="finished-tasks-count">0</span>
+    </div>
+  </footer>
+</div>
