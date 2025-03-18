@@ -1,5 +1,8 @@
-import { getFromStorage, addToStorage } from "../utils";
+import { getFromStorage } from "../utils";
 import { Task } from "../models/Task";
+
+// TODO
+import { renderTasks, appState } from "../app";
 
 // Получить все задачи
 export const getTasks = () => {
@@ -58,9 +61,67 @@ export function updateTask(id, updatedFields) {
 
   console.log("Updated tasks in localStorage:", tasksForStorage);
 }
-// Удалить задачу
-export const deleteTask = (id) => {
-  const tasks = getTasks();
-  const updatedTasks = tasks.filter((t) => t.id !== id);
-  localStorage.setItem("tasks", JSON.stringify(updatedTasks.map((t) => ({ id: t.id, title: t.title, status: t.status }))));
+
+
+// Удаление задачи
+export function deleteTask(id) {
+  let tasks = getFromStorage("tasks"); // Загружаем все задачи
+  if (!tasks || tasks.length === 0) return false; // Если задач нет, ничего не делаем
+
+  console.log("Deleting task with ID:", id);
+
+  // Фильтруем задачи, исключая ту, которую нужно удалить
+  const updatedTasks = tasks.filter(task => task.id !== id);
+
+  // Сохраняем обновленный массив задач в localStorage
+  localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+
+  console.log("Updated tasks in localStorage:", updatedTasks);
+
+  // Обновляем глобальное состояние
+  appState.tasks = updatedTasks; // Обновляем appState.tasks
+  renderTasks();
+  return true;
 };
+
+// изменить титл
+export function editTask(id) {
+  const task = appState.tasks.find(task => task.id === id);
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = task.title;
+  input.classList.add("form-control", "mb-2");
+
+  const saveButton = document.createElement("button");
+  saveButton.textContent = "Save";
+  saveButton.classList.add("btn", "btn-primary", "w-100");
+
+  const listElement = document.querySelector(`#${task.status}-list`);
+  const taskItem = listElement.querySelector(`[data-task-id="${id}"]`);
+
+  taskItem.style.display = "none";
+
+  const formContainer = document.createElement("div");
+  formContainer.classList.add("task-edit-form");
+  formContainer.appendChild(input);
+  formContainer.appendChild(saveButton);
+
+  listElement.insertBefore(formContainer, taskItem.nextSibling);
+
+  // Сохраняем изменения
+  saveButton.addEventListener("click", () => {
+    const newTitle = input.value.trim();
+    if (newTitle) {
+        task.title = newTitle;
+        localStorage.setItem("tasks", JSON.stringify(appState.tasks));
+        renderTasks();
+    } else {
+        alert("Название задачи не может быть пустым!");
+    }
+    //listElement.removeChild(formContainer); // Удаляем форму
+    taskItem.style.display = "block"; // Возвращаем задачу
+});
+
+input.focus(); // Фокусируем на поле ввода
+}

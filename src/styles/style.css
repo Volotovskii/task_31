@@ -106,3 +106,19 @@
 #user-menu-button.show::after { 
   transform: rotate(180deg);
 }
+
+.list-group-item {
+  position: relative; /* Создаём контейнер для кнопок */
+  padding-right: 30px; /* Отступ справа для кнопок */
+}
+
+.list-group-item .quick-edit,
+.list-group-item .quick-delete {
+  cursor: pointer;
+  display: none; /* Скрываем кнопки по умолчанию */
+}
+
+.list-group-item:hover .quick-edit,
+.list-group-item:hover .quick-delete {
+  display: inline-block; /* Показываем кнопки при hover */
+}

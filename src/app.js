@@ -7,9 +7,9 @@ import { generateTestUser } from "./utils";
 import { State } from "./state";
 import { authUser } from "./services/auth";
 
-import { getTasks, addTask, updateTask } from "./services/task";
+import { getTasks, addTask, updateTask,deleteTask,editTask  } from "./services/task";
 import { Task } from "./models/Task";
-import { setupUserMenuActions, isAdmin} from "./services/userMenu"
+import { setupUserMenuActions, isAdmin } from "./services/userMenu"
 
 export const appState = new State();
 let draggedTaskId = null;
@@ -19,7 +19,7 @@ const loginForm = document.querySelector("#app-login-form");
 generateTestUser(User);
 
 
-console.log('appState.currentUser',appState.currentUser);
+console.log('appState.currentUser', appState.currentUser);
 
 loginForm.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -34,9 +34,9 @@ loginForm.addEventListener("submit", function (e) {
     document.querySelector("#content").innerHTML = taskFieldTemplate;
     const userLoginDiv = document.getElementById("user-login");
     userLoginDiv.textContent = `Добро пожаловать ${appState.currentUser.login}`;
-    console.log('Добро пожаловать',appState.currentUser.login);
-    console.log('appState.currentUser',appState.currentUser);
-    console.log('appState.',appState);
+    console.log('Добро пожаловать', appState.currentUser.login);
+    console.log('appState.currentUser', appState.currentUser);
+    console.log('appState.', appState);
 
     // // Скрываем форму авторизации
     const loginForm = document.getElementById("app-login-form");
@@ -61,7 +61,7 @@ loginForm.addEventListener("submit", function (e) {
 });
 
 // TODO подумать для нового рендера (перенести в таск?)
-export function workingButtons(){
+export function workingButtons() {
   document.getElementById("add-backlog-card").addEventListener("click", () => addNewTask("backlog"));
   document.getElementById("add-ready-card").addEventListener("click", () => moveTaskFromList("backlog", "ready"));
   document.getElementById("add-in-progress-card").addEventListener("click", () => moveTaskFromList("ready", "in-progress"));
@@ -150,7 +150,7 @@ function addNewTask(status) {
 // TODO переносить в отдельный файл move \ render
 // Рендеринг задач
 export function renderTasks() {
-  
+
   console.log("Rendering tasks. Current state:", appState.tasks);
   //let draggedTaskId = null;  // перенести глобально , но отрисовываю пока полностью 
   console.log('после начала перестаскивания ')
@@ -196,6 +196,7 @@ export function renderTasks() {
 
     console.log(`Tasks for ${status}:`, tasksForList);
 
+    //TODO вынести в отдельную функцию создание карточек и Модификация их 
     tasksForList.forEach((task) => {
       const item = document.createElement("div");
       item.classList.add("list-group-item", "mb-2", "draggable");
@@ -204,10 +205,12 @@ export function renderTasks() {
       item.draggable = true; // Делаем элемент draggable
       //item.textContent = `${task.title} ${isAdmin(appState.currentUser) ? `(User: ${task.userId})` : ""}`;
       //item.textContent = task.title;
+
+      // Заголовок задачи
       const taskTitle = document.createElement("span");
       taskTitle.textContent = task.title;
 
-
+      // Информация об авторе
       const taskAuthor = document.createElement("span");
       taskAuthor.textContent = `Автор: ${task.userLogin}`;
       console.log('task', task);
@@ -216,9 +219,31 @@ export function renderTasks() {
       taskAuthor.style.borderTop = "1px solid #ccc";
       taskAuthor.style.paddingTop = "4px";
 
+      // Добавить кнопки удаления и ред.
+      const editingTask = document.createElement("button");
+      editingTask.classList.add("btn", "btn-sm", "btn-secondary", "me-2", "quick-edit");
+      editingTask.title = "Редактировать";
+      editingTask.innerHTML = '<i class="bi bi-pencil-fill"></i>'; // Иконка редактирования
+      editingTask.addEventListener("click", () => editTask(task.id));
+
+      // const imgEdit = document.createElement("img");
+      // imgEdit.src = "./assets/avatar.png";
+      // imgEdit.alt = "Описание изображения"; // Важно для доступности
+      // editingTask.appendChild(imgEdit);
+
+      // Кнопка удаления
+      const deleteButton = document.createElement("button");
+      deleteButton.classList.add("btn", "btn-sm", "btn-danger", "quick-delete");
+      deleteButton.title = "Удалить";
+      deleteButton.innerHTML = '<i class="bi bi-trash-fill"></i>'; // Иконка удаления
+      deleteButton.addEventListener("click", () => deleteTask(task.id));
+
       // Добавляем элементы в div
       item.appendChild(taskTitle);
       item.appendChild(taskAuthor);
+      item.appendChild(editingTask);
+      item.appendChild(deleteButton);
+
 
       // Обработчик dragstart
       item.addEventListener("dragstart", handleDragStart);
@@ -295,7 +320,7 @@ function moveTaskFromList(fromStatus, toStatus) {
 
       console.log("Moving task:", selectedTaskId, "to status:", toStatus);
       moveTask(selectedTaskId, toStatus);
-      hideButtonAll(toStatus);
+
     }
     console.log("Removing dropdown and button...");
 
@@ -406,25 +431,25 @@ function handleDragStart(event) {
 
 
 function handleDragEnd(event) {
-      // Сохраняем текущий ID задачи
-      const currentDraggedTaskId = draggedTaskId;
+  // Сохраняем текущий ID задачи
+  const currentDraggedTaskId = draggedTaskId;
 
-      // Сбрасываем ID перетаскиваемой задачи
-      draggedTaskId = null;
-  
-      // Находим задачу в appState.tasks
-      const taskItem = appState.tasks.find(task => task.id === currentDraggedTaskId);
-  
-      if (taskItem) {
-          console.log('handleDragEnd');
-          // Находим элемент задачи в DOM
-          const domTaskItem = document.querySelector(`[data-task-id="${currentDraggedTaskId}"]`);
-  
-          if (domTaskItem) {
-              domTaskItem.style.display = "block"; // Возвращаем видимость задачи
-              domTaskItem.style.opacity = "1"; // Возвращаем прозрачность
-          }
-      }
+  // Сбрасываем ID перетаскиваемой задачи
+  draggedTaskId = null;
+
+  // Находим задачу в appState.tasks
+  const taskItem = appState.tasks.find(task => task.id === currentDraggedTaskId);
+
+  if (taskItem) {
+    console.log('handleDragEnd');
+    // Находим элемент задачи в DOM
+    const domTaskItem = document.querySelector(`[data-task-id="${currentDraggedTaskId}"]`);
+
+    if (domTaskItem) {
+      domTaskItem.style.display = "block"; // Возвращаем видимость задачи
+      domTaskItem.style.opacity = "1"; // Возвращаем прозрачность
+    }
+  }
 }
 
 function handleDragEnter(event) {
@@ -458,7 +483,7 @@ function handleDragOver(event) {
 }
 
 function handleDrop(event) {
-  
+
   event.preventDefault();
 
   const column = event.currentTarget; // Контейнер колонки
@@ -480,9 +505,9 @@ function handleDrop(event) {
 // Условия переноса 
 function isValidMove(currentStatus, newStatus) {
   const validMoves = {
-    backlog: ["ready","backlog"],
-    ready: ["backlog","in-progress","ready"],
-    "in-progress": ["finished","ready","backlog","in-progress"],
+    backlog: ["ready", "backlog"],
+    ready: ["backlog", "in-progress", "ready"],
+    "in-progress": ["finished", "ready", "backlog", "in-progress"],
     finished: ["finished"]
   };
   return validMoves[currentStatus]?.includes(newStatus) || false;
