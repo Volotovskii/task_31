@@ -7,7 +7,7 @@ import { generateTestUser } from "./utils";
 import { State } from "./state";
 import { authUser } from "./services/auth";
 
-import { getTasks, addTask, updateTask,deleteTask,editTask  } from "./services/task";
+import { getTasks, addTask, updateTask, deleteTask, editTask, disableAllColumns, enableAllColumns } from "./services/task";
 import { Task } from "./models/Task";
 import { setupUserMenuActions, isAdmin } from "./services/userMenu"
 
@@ -32,8 +32,9 @@ loginForm.addEventListener("submit", function (e) {
 
 
     document.querySelector("#content").innerHTML = taskFieldTemplate;
-    const userLoginDiv = document.getElementById("user-login");
-    userLoginDiv.textContent = `Добро пожаловать ${appState.currentUser.login}`;
+    const userLogin = document.getElementById("user-welcome");
+    userLogin.textContent = `Добро пожаловать ${appState.currentUser.login}`;
+    console.log('Добро userLogin', userLogin);
     console.log('Добро пожаловать', appState.currentUser.login);
     console.log('appState.currentUser', appState.currentUser);
     console.log('appState.', appState);
@@ -73,6 +74,8 @@ export function workingButtons() {
 // TODO заретить нажатие кнопки при создание задачи 
 // Заменить кнопку add на самбит 
 function addNewTask(status) {
+  disableAllColumns(); // Отключаем все колонки
+  
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder = "Enter task title";
@@ -119,6 +122,7 @@ function addNewTask(status) {
     if (input.parentNode === list) list.removeChild(input);
     if (submitButton.parentNode === list) list.removeChild(submitButton);
 
+    enableAllColumns(); // Включаем все колонки обратно
     // Показать Add
     hideButtonAll(status);
   }
@@ -277,7 +281,7 @@ export function renderTasks() {
 // Перемещение задачи из одного списка в другой
 // Разместить тут закрытие кнопок add ?? под 3 состояния ? TODO
 function moveTaskFromList(fromStatus, toStatus) {
-
+  disableAllColumns(); // Отключаем все колонки
 
   const dropdown = document.createElement("select");
   dropdown.classList.add("form-select", "mb-2");
@@ -330,6 +334,7 @@ function moveTaskFromList(fromStatus, toStatus) {
     if (dropdown.parentNode === list) list.removeChild(dropdown);
     if (button.parentNode === list) list.removeChild(button);
 
+    enableAllColumns(); // Включаем все колонки обратно
     // Показать Add
     hideButtonAll(toStatus);
   }

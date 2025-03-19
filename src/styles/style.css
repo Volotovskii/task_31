@@ -27,6 +27,11 @@
   background-color: rgba(0, 123, 255, 0.1);
 }
 
+.kanban-column.disabled-state .btn-block {
+  pointer-events: none; /* Отключаем возможность клика */
+  opacity: 0.5; /* Делаем кнопки полупрозрачными */
+}
+
 .list-group-item.draggable {
   cursor: grab;
   transition: opacity 0.2s ease;
@@ -93,6 +98,7 @@
   cursor: pointer;
 }
 
+
 @media (min-width: 768px) {
   .col-md-3 {
       flex: 0 0 auto;
@@ -121,4 +127,8 @@
 .list-group-item:hover .quick-edit,
 .list-group-item:hover .quick-delete {
   display: inline-block; /* Показываем кнопки при hover */
+}
+
+.white-text{
+  color: white;
 }

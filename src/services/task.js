@@ -33,7 +33,7 @@ export const addTask = (task) => {
   console.log("Added task. Updated tasks in localStorage:", tasks);
 };
 
-
+// обновляем при переносе
 export function updateTask(id, updatedFields) {
   const tasks = getTasks(); // Получаем текущие задачи
 
@@ -84,7 +84,7 @@ export function deleteTask(id) {
   return true;
 };
 
-// изменить титл
+// изменить текст в задаче
 export function editTask(id) {
   const task = appState.tasks.find(task => task.id === id);
 
@@ -119,9 +119,22 @@ export function editTask(id) {
     } else {
         alert("Название задачи не может быть пустым!");
     }
-    //listElement.removeChild(formContainer); // Удаляем форму
+
     taskItem.style.display = "block"; // Возвращаем задачу
 });
 
 input.focus(); // Фокусируем на поле ввода
 }
+
+// отключаем все кнопки .btn-block (добавление-перемещение задачи)
+//////
+export function disableAllColumns() {
+  const columns = document.querySelectorAll(".kanban-column");
+  columns.forEach(column => column.classList.add("disabled-state"));
+}
+
+export function enableAllColumns() {
+  const columns = document.querySelectorAll(".kanban-column");
+  columns.forEach(column => column.classList.remove("disabled-state"));
+}
+//////
