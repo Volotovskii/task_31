@@ -84,8 +84,19 @@ export function deleteTask(id) {
   return true;
 };
 
+let activeEditTaskId = null;
 // изменить текст в задаче
+// TODO Модальное окно?  убрать можно будет activeEditTaskId
 export function editTask(id) {
+
+  if (activeEditTaskId) {
+    alert("Вы уже редактируете другую задачу!");
+    return;
+  }
+
+  disableAllColumns();
+  activeEditTaskId = id; // Устанавливаем ID активной задачи
+
   const task = appState.tasks.find(task => task.id === id);
 
   const input = document.createElement("input");
@@ -113,17 +124,20 @@ export function editTask(id) {
   saveButton.addEventListener("click", () => {
     const newTitle = input.value.trim();
     if (newTitle) {
-        task.title = newTitle;
-        localStorage.setItem("tasks", JSON.stringify(appState.tasks));
-        renderTasks();
+
+      task.title = newTitle;
+      localStorage.setItem("tasks", JSON.stringify(appState.tasks));
+      renderTasks();
     } else {
-        alert("Название задачи не может быть пустым!");
+      alert("Название задачи не может быть пустым!");
     }
-
+    
+    enableAllColumns();
+    activeEditTaskId = null; // Устанавливаем ID активной задачи
     taskItem.style.display = "block"; // Возвращаем задачу
-});
+  });
 
-input.focus(); // Фокусируем на поле ввода
+  input.focus(); // Фокусируем на поле ввода
 }
 
 // отключаем все кнопки .btn-block (добавление-перемещение задачи)
