@@ -4,13 +4,11 @@ import { Task } from "../models/Task";
 // TODO
 import { renderTasks, appState } from "../app";
 
+let activeEditTaskId = null; // Редактирование только 1 задачи
+
 // Получить все задачи
 export const getTasks = () => {
-  // id (статик id)
-  //console.log('Task new',Task(taskData.title, taskData.status,taskData.userId,taskData.userLogin,taskData.id) );
-
   return getFromStorage("tasks").map((taskData) => new Task(taskData.title, taskData.status, taskData.userId, taskData.userLogin, taskData.id));
-
   //return JSON.parse(localStorage.getItem("tasks") || "[]").map((taskData) => new Task(taskData.title, taskData.status));
 };
 
@@ -28,9 +26,6 @@ export const addTask = (task) => {
     userLogin: t.userLogin
   }));
   localStorage.setItem("tasks", JSON.stringify(tasksForStorage)); // Сохраняем обновленные задачи
-
-  //localStorage.setItem("tasks", JSON.stringify(tasks.map((t) => ({ id: t.id, title: t.title, status: t.status }))));
-  console.log("Added task. Updated tasks in localStorage:", tasks);
 };
 
 // обновляем при переносе
@@ -40,6 +35,7 @@ export function updateTask(id, updatedFields) {
   const updatedTasks = tasks.map((task) => {
     if (task.id === id) {
 
+      console.log('-------------------------------------------------');
       console.log("Updating task in localStorage:", task, "with fields:", updatedFields);
       return { ...task, ...updatedFields }; // Обновляем задачу с указанными полями
     }
@@ -54,12 +50,8 @@ export function updateTask(id, updatedFields) {
     userLogin: task.userLogin
   }));
 
-
-
   // Сохраняем обновленный массив задач в localStorage
   localStorage.setItem("tasks", JSON.stringify(tasksForStorage));
-
-  console.log("Updated tasks in localStorage:", tasksForStorage);
 }
 
 
@@ -68,14 +60,13 @@ export function deleteTask(id) {
   let tasks = getFromStorage("tasks"); // Загружаем все задачи
   if (!tasks || tasks.length === 0) return false; // Если задач нет, ничего не делаем
 
-  console.log("Deleting task with ID:", id);
-
   // Фильтруем задачи, исключая ту, которую нужно удалить
   const updatedTasks = tasks.filter(task => task.id !== id);
 
   // Сохраняем обновленный массив задач в localStorage
   localStorage.setItem("tasks", JSON.stringify(updatedTasks));
 
+  console.log('-------------------------------------------------');
   console.log("Updated tasks in localStorage:", updatedTasks);
 
   // Обновляем глобальное состояние
@@ -84,7 +75,7 @@ export function deleteTask(id) {
   return true;
 };
 
-let activeEditTaskId = null;
+
 // изменить текст в задаче
 // TODO Модальное окно?  убрать можно будет activeEditTaskId
 export function editTask(id) {
@@ -133,6 +124,7 @@ export function editTask(id) {
     }
 
     enableAllColumns();
+
     activeEditTaskId = null; // Устанавливаем ID активной задачи
     taskItem.style.display = "block"; // Возвращаем задачу
   });
@@ -144,9 +136,9 @@ export function editTask(id) {
 //////
 export function disableAllColumns() {
   const columns = document.querySelectorAll(".kanban-column");
-  console.log('columns',columns);
   columns.forEach(column => column.classList.add("disabled-state"));
-  console.log('columns forEach',columns);
+
+  console.log('-------------------------------------------------');
 }
 
 export function enableAllColumns() {
@@ -156,9 +148,7 @@ export function enableAllColumns() {
 //////
 
 // Отключаем Drag'n'Drop
-/////
-
-export function enbleDragDrop(){
+export function enbleDragDrop() {
   const columns = document.querySelectorAll(".kanban-column");
   columns.forEach(column => column.classList.add("disabled-state"));
 }

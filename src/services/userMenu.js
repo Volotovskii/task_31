@@ -6,7 +6,7 @@ import taskFieldTemplate from "../templates/taskField.html";
 import { getFromStorage, addUser } from "../utils";
 
 
-import{renderTasks,workingButtons,appState} from "../app";
+import { renderTasks, workingButtons, appState } from "../app";
 
 
 
@@ -64,8 +64,6 @@ export function setupUserMenuActions() {
 
     }
 
-
-
     areHandlersAttached = true;
 }
 
@@ -77,7 +75,6 @@ export function logOutUser() {
     // Скрываем панель пользователя
     const userMenuContainer = document.getElementById("user-menu-container");
     if (userMenuContainer) userMenuContainer.style.display = "none";
-    console.log('logOutUser');
 
     // Возвращаем форму авторизации
     document.querySelector("#content").innerHTML = noAccessTemplate;
@@ -88,7 +85,6 @@ export function logOutUser() {
 
     const userLogin = document.getElementById("user-welcome");
     userLogin.textContent = ``;
-    //areHandlersAttached = false;
 }
 
 // Показ формы для управления пользователями
@@ -119,9 +115,8 @@ function initializeManageUsersForm() {
     const addUserForm = document.getElementById("add-user-form");
     const usersList = document.getElementById("users-list");
     const backToTasksButton = document.getElementById("back-to-tasks-btn");
-    console.log('initializeManageUsersForm addUserForm', addUserForm);
-    if (addUserForm) {
 
+    if (addUserForm) {
         addUserForm.addEventListener("submit", function (e) {
             e.preventDefault();
             const formData = new FormData(addUserForm);
@@ -131,8 +126,7 @@ function initializeManageUsersForm() {
 
             if (login && password) {
                 const newUser = addUser(login, password, role); // Добавляем нового пользователя
-                if(!newUser) return addUserForm.reset();;
-                console.log('initializeManageUsersForm', newUser);
+                if (!newUser) return addUserForm.reset();;
 
                 alert(`Пользователь "${newUser.login}" успешно создан.`);
                 renderUsers(); // Перерисовываем список пользователей
@@ -165,13 +159,13 @@ function renderUsers() {
     usersList.innerHTML = ""; // Очищаем список
 
     const users = getFromStorage("users"); // Загружаем всех пользователей
-    console.log('renderUsers', users);
+
     if (!users || users.length === 0) {
         const noUsersItem = document.createElement("div");
         noUsersItem.textContent = "Нет доступных пользователей.";
         noUsersItem.classList.add("list-group-item");
         usersList.appendChild(noUsersItem);
-   
+
         return;
     }
 
@@ -185,9 +179,8 @@ function renderUsers() {
         const deleteUserButton = document.createElement("button");
         deleteUserButton.textContent = "Delete";
         deleteUserButton.classList.add("btn", "btn-danger", "btn-sm");
-        console.log('renderUsers deleteUserButton', deleteUserButton);
         deleteUserButton.addEventListener("click", function (event) {
-            event.stopPropagation(); 
+            event.stopPropagation();
             const confirmDelete = window.confirm(`Удалить пользователя "${user.login}"?`);
             if (confirmDelete) {
                 removeUser(user.id); // Удаляем пользователя

@@ -28,7 +28,6 @@ loginForm.addEventListener("submit", function (e) {
 
   if (authUser(login, password)) {
 
-
     document.querySelector("#content").innerHTML = taskFieldTemplate;
     const userLogin = document.getElementById("user-welcome");
     userLogin.textContent = `Добро пожаловать ${appState.currentUser.login}`;
@@ -129,10 +128,6 @@ function addNewTask(status) {
 // Рендеринг задач
 export function renderTasks() {
 
-  console.log("Rendering tasks. Current state:", appState.tasks);
-  //let draggedTaskId = null;  // перенести глобально , но отрисовываю пока полностью 
-  console.log('после начала перестаскивания ')
-
   const columns = document.querySelectorAll(".kanban-column"); // все колонки 
   columns.forEach(column => {
 
@@ -163,8 +158,6 @@ export function renderTasks() {
       item.dataset.taskId = task.id;
       //item.textContent = task.title;
       item.draggable = true; // Делаем элемент draggable
-      //item.textContent = `${task.title} ${isAdmin(appState.currentUser) ? `(User: ${task.userId})` : ""}`;
-      //item.textContent = task.title;
 
       // Заголовок задачи
       const taskTitle = document.createElement("span");
@@ -173,7 +166,6 @@ export function renderTasks() {
       // Информация об авторе
       const taskAuthor = document.createElement("span");
       taskAuthor.textContent = `Автор: ${task.userLogin}`;
-      console.log('task', task);
       taskAuthor.style.display = "block"; //отдельной строкой
       taskAuthor.style.fontSize = "smaller"; // размер шрифта автора
       taskAuthor.style.borderTop = "1px solid #ccc";
@@ -185,11 +177,6 @@ export function renderTasks() {
       editingTask.title = "Редактировать";
       editingTask.innerHTML = '<i class="bi bi-pencil-fill"></i>'; // Иконка редактирования
       editingTask.addEventListener("click", () => editTask(task.id));
-
-      // const imgEdit = document.createElement("img");
-      // imgEdit.src = "./assets/avatar.png";
-      // imgEdit.alt = "Описание изображения"; // Важно для доступности
-      // editingTask.appendChild(imgEdit);
 
       // Кнопка удаления
       const deleteButton = document.createElement("button");
@@ -211,20 +198,9 @@ export function renderTasks() {
 
       listElement.appendChild(item);
 
-
-      // Настройка drag&drop
-      // item.addEventListener("dragstart", handleDragStart);
-      // item.addEventListener("dragend", handleDragEnd);
-      // Настройка drag&drop
-      // item.addEventListener("dragstart", handleDragStart);
-      // item.addEventListener("dragover", handleDragOver);
-      // item.addEventListener("drop", handleDrop);
     });
+
     // Добавляем обработчики событий к колонке
-
-    //column.addEventListener("drop",(e) => 
-
-
     column.addEventListener("dragenter", handleDragEnter); // Обработчик входа в зону
     column.addEventListener("dragleave", handleDragLeave); // Обработчик выхода из зоны
     column.addEventListener("dragover", handleDragOver); // Обработчик события dragover
@@ -235,14 +211,11 @@ export function renderTasks() {
 }
 
 // Перемещение задачи из одного списка в другой
-// Разместить тут закрытие кнопок add ?? под 3 состояния ? TODO
 function moveTaskFromList(fromStatus, toStatus) {
   disableAllColumns(); // Отключаем все колонки
 
   const dropdown = document.createElement("select");
   dropdown.classList.add("form-select", "mb-2");
-
-
 
   const tasks = appState.tasks.filter((t) => t.status === fromStatus);
   tasks.forEach((task) => {
@@ -257,6 +230,7 @@ function moveTaskFromList(fromStatus, toStatus) {
   buttonMovingTask.textContent = "Add";
   buttonMovingTask.classList.add("btn", "btn-primary", "w-100");
 
+  // Отмена переноса
   const buttonCancelTask = document.createElement("button");
   buttonCancelTask.textContent = "cancel";
   buttonCancelTask.classList.add("btn", "btn-danger", "w-100");
@@ -271,7 +245,6 @@ function moveTaskFromList(fromStatus, toStatus) {
 
   // Обработчик потери фокуса (blur)
   function offFocusBlur() {
-    console.log('moveTaskFromList tasks');
     muveTaskButton(dropdown.value, toStatus);
   }
 
@@ -284,7 +257,7 @@ function moveTaskFromList(fromStatus, toStatus) {
     if (dropdown.parentNode === list) list.removeChild(dropdown);
     if (buttonMovingTask.parentNode === list) list.removeChild(buttonMovingTask);
     if (buttonCancelTask.parentNode === list) list.removeChild(buttonCancelTask);
-  
+
     enableAllColumns(); // Включаем все колонки обратно
     // Показать Add
     hideButtonAll(toStatus);
@@ -293,15 +266,9 @@ function moveTaskFromList(fromStatus, toStatus) {
   function muveTaskButton(selectedTaskId, toStatus) {
 
     if (selectedTaskId) {
-
-      console.log("Moving task:", selectedTaskId, "to status:", toStatus);
       moveTask(selectedTaskId, toStatus);
 
     }
-    console.log("Removing dropdown and button...");
-
-    // list.removeChild(dropdown);
-    // list.removeChild(button);
 
     if (dropdown.parentNode === list) list.removeChild(dropdown);
     if (buttonMovingTask.parentNode === list) list.removeChild(buttonMovingTask);
@@ -319,24 +286,6 @@ function moveTaskFromList(fromStatus, toStatus) {
   buttonMovingTask.addEventListener("click", onFocusSubmitButton);
   buttonCancelTask.addEventListener("click", onFocusCancelButton);
   dropdown.addEventListener("blur", offFocusBlur); // Обработка потери фокуса не рабоатет 
-
-  //dropdown.focus();
-  // button.addEventListener("click", () => {
-
-  //   const selectedTaskId = dropdown.value;
-
-  //   if (selectedTaskId) {
-  //     console.log("Moving task:", selectedTaskId, "to status:", toStatus);
-  //     moveTask(selectedTaskId, toStatus);
-  //     hideButtonAll(toStatus);
-  //   }
-  //   console.log("Removing dropdown and button...");
-
-  //   list.removeChild(dropdown);
-  //   list.removeChild(button);
-
-  // });
-
 }
 
 
@@ -346,7 +295,6 @@ function moveTask(id, newStatus) {
 
   if (taskIndex !== -1) {
     // Обновляем статус задачи в localStorage
-    console.log("Updating task in localStorage:", id, newStatus);
     updateTask(id, { status: newStatus });
 
     // Обновляем статус задачи в appState.tasks
@@ -354,9 +302,7 @@ function moveTask(id, newStatus) {
 
     // Перерисовываем Kanban-доску
     renderTasks();
-    console.log("Updated task in memory:", appState.tasks.find((t) => t.id === id));
 
-    checkLocalStorage();
   } else {
     console.error("Task not found with ID:", id);
   }
@@ -390,13 +336,6 @@ function hideButtonAll(status) {
   return lists[status].style.display = lists[status].style.display === 'none' ? 'block' : 'none';
 }
 
-// Удалить
-// првоерит в консоли localStorage
-function checkLocalStorage() {
-  const storedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-  console.log("Current state in localStorage:", storedTasks);
-}
-
 
 //TODO Перенести всё связанное с задачами в другой файл?  services/tasks 
 // Drag&drop handlers
@@ -420,7 +359,6 @@ function handleDragEnd(event) {
   const taskItem = appState.tasks.find(task => task.id === currentDraggedTaskId);
 
   if (taskItem) {
-    console.log('handleDragEnd');
     // Находим элемент задачи в DOM
     const domTaskItem = document.querySelector(`[data-task-id="${currentDraggedTaskId}"]`);
 
