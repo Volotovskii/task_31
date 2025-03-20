@@ -19,8 +19,6 @@ const loginForm = document.querySelector("#app-login-form");
 generateTestUser(User);
 
 
-console.log('appState.currentUser', appState.currentUser);
-
 loginForm.addEventListener("submit", function (e) {
   e.preventDefault();
   const formData = new FormData(loginForm);
@@ -34,10 +32,8 @@ loginForm.addEventListener("submit", function (e) {
     document.querySelector("#content").innerHTML = taskFieldTemplate;
     const userLogin = document.getElementById("user-welcome");
     userLogin.textContent = `Добро пожаловать ${appState.currentUser.login}`;
-    console.log('Добро userLogin', userLogin);
+
     console.log('Добро пожаловать', appState.currentUser.login);
-    console.log('appState.currentUser', appState.currentUser);
-    console.log('appState.', appState);
 
     // // Скрываем форму авторизации
     const loginForm = document.getElementById("app-login-form");
@@ -71,11 +67,9 @@ export function workingButtons() {
 
 
 // Добавление новой задачи
-// TODO заретить нажатие кнопки при создание задачи 
-// Заменить кнопку add на самбит 
 function addNewTask(status) {
   disableAllColumns(); // Отключаем все колонки
-  
+
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder = "Enter task title";
@@ -84,7 +78,6 @@ function addNewTask(status) {
   const submitButton = document.createElement("button");
   submitButton.textContent = "Submit";
   submitButton.classList.add("btn", "btn-primary", "w-100");
-
 
   // Скрыть Add
   hideButtonAll(status);
@@ -108,7 +101,8 @@ function addNewTask(status) {
     if (title) {
 
       const newTask = new Task(title, status, appState.currentUser.storageKey, appState.currentUser.login); // Создаем новую задачу
-      console.log('newTask', newTask, 'appState.currentUser.login', appState.currentUser.login);
+
+      console.log('newTask- ', newTask, 'appState.currentUser.login- ', appState.currentUser.login);
       addTask(newTask); // Сохраняем её в localStorage
       appState.tasks.push(newTask); // Добавляем в глобальное состояние
 
@@ -116,8 +110,6 @@ function addNewTask(status) {
 
     }
 
-    //list.removeChild(input);
-    //list.removeChild(submitButton);
     // Проверить есть элемент 
     if (input.parentNode === list) list.removeChild(input);
     if (submitButton.parentNode === list) list.removeChild(submitButton);
@@ -126,24 +118,6 @@ function addNewTask(status) {
     // Показать Add
     hideButtonAll(status);
   }
-
-  // submitButton.addEventListener("click", () => {
-  //   const title = input.value.trim();
-  //   if (title) {
-  //     const newTask = new Task(title, status); // Создаем новую задачу
-  //     addTask(newTask); // Сохраняем её в localStorage
-  //     appState.tasks.push(newTask); // Добавляем в глобальное состояние
-  //     renderTasks(); // Перерисовываем Kanban-доску
-
-  //     button123.style.display = "block"; // TODO
-  //   }
-  //   input.addEventListener("blur", handleBlur); // Обработка потери фокуса
-  //   list.removeChild(input);
-  //   list.removeChild(submitButton);
-
-  //   button123.style.display = "block"; // TODO
-  // });
-
 
   submitButton.addEventListener("click", onFocusSubmitButton);
   input.addEventListener("blur", offFocusBlur); // Обработка потери фокуса не рабоатет 
@@ -159,22 +133,11 @@ export function renderTasks() {
   //let draggedTaskId = null;  // перенести глобально , но отрисовываю пока полностью 
   console.log('после начала перестаскивания ')
 
-  // const lists = {
-  //   backlog: document.getElementById("backlog-list"),
-  //   ready: document.getElementById("ready-list"),
-  //   "in-progress": document.getElementById("in-progress-list"),
-  //   finished: document.getElementById("finished-list"),
-  // };
-
-  // for (const status in lists) {
-  //   const listElement = lists[status];
-  //   console.log('lists[status]' ,listElement);
   const columns = document.querySelectorAll(".kanban-column"); // все колонки 
   columns.forEach(column => {
 
     const status = column.dataset.status; // Статус колонки (backlog, ready и т.д.)
-    console.log('column.dataset', column.dataset);
-    console.log(status);
+
     const listElement = column.querySelector(`#${status}-list`);
 
     if (!listElement) {
@@ -184,19 +147,12 @@ export function renderTasks() {
 
     listElement.innerHTML = ""; // Очищаем список
 
-    // Добавляем обработчики для списка
-    // listElement.addEventListener("dragover", handleDragOver);
-    // listElement.addEventListener("drop", handleDrop);
-
     console.log(`Rendering tasks for status: ${status}`);
-
-    //const tasksForList = appState.tasks.filter((task) => task.status === status);
 
     // TODO Фильтруем по id логина ? 
     // Фильтруем задачи по userId, если пользователь не администратор userId(задача) => storageKey (пользователь)
     const tasksForList = isAdmin(appState.currentUser) ? appState.tasks.filter(task => task.status === status)
       : appState.tasks.filter(task => task.status === status && task.userId === appState.currentUser.storageKey && task.userLogin === appState.currentUser.login);
-
 
     console.log(`Tasks for ${status}:`, tasksForList);
 
@@ -296,13 +252,19 @@ function moveTaskFromList(fromStatus, toStatus) {
     dropdown.appendChild(option);
   });
 
-  const button = document.createElement("button");
-  button.textContent = "Add";
-  button.classList.add("btn", "btn-primary", "w-100");
+  // перемещение задач
+  const buttonMovingTask = document.createElement("button");
+  buttonMovingTask.textContent = "Add";
+  buttonMovingTask.classList.add("btn", "btn-primary", "w-100");
+
+  const buttonCancelTask = document.createElement("button");
+  buttonCancelTask.textContent = "cancel";
+  buttonCancelTask.classList.add("btn", "btn-danger", "w-100");
 
   const list = document.querySelector(`#${toStatus}-list`);
   list.appendChild(dropdown);
-  list.appendChild(button);
+  list.appendChild(buttonMovingTask);
+  list.appendChild(buttonCancelTask);
 
   // Скрыть Add
   hideButtonAll(toStatus);
@@ -317,6 +279,16 @@ function moveTaskFromList(fromStatus, toStatus) {
     muveTaskButton(dropdown.value, toStatus);
   }
 
+  // Кнопка отметы при move
+  function onFocusCancelButton() {
+    if (dropdown.parentNode === list) list.removeChild(dropdown);
+    if (buttonMovingTask.parentNode === list) list.removeChild(buttonMovingTask);
+    if (buttonCancelTask.parentNode === list) list.removeChild(buttonCancelTask);
+  
+    enableAllColumns(); // Включаем все колонки обратно
+    // Показать Add
+    hideButtonAll(toStatus);
+  }
 
   function muveTaskButton(selectedTaskId, toStatus) {
 
@@ -332,7 +304,8 @@ function moveTaskFromList(fromStatus, toStatus) {
     // list.removeChild(button);
 
     if (dropdown.parentNode === list) list.removeChild(dropdown);
-    if (button.parentNode === list) list.removeChild(button);
+    if (buttonMovingTask.parentNode === list) list.removeChild(buttonMovingTask);
+    if (buttonCancelTask.parentNode === list) list.removeChild(buttonCancelTask);
 
     enableAllColumns(); // Включаем все колонки обратно
     // Показать Add
@@ -343,7 +316,8 @@ function moveTaskFromList(fromStatus, toStatus) {
 
   fg12.addEventListener("blur", offFocusBlur);
 
-  button.addEventListener("click", onFocusSubmitButton);
+  buttonMovingTask.addEventListener("click", onFocusSubmitButton);
+  buttonCancelTask.addEventListener("click", onFocusCancelButton);
   dropdown.addEventListener("blur", offFocusBlur); // Обработка потери фокуса не рабоатет 
 
   //dropdown.focus();

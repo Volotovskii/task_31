@@ -131,7 +131,7 @@ export function editTask(id) {
     } else {
       alert("Название задачи не может быть пустым!");
     }
-    
+
     enableAllColumns();
     activeEditTaskId = null; // Устанавливаем ID активной задачи
     taskItem.style.display = "block"; // Возвращаем задачу
@@ -144,7 +144,9 @@ export function editTask(id) {
 //////
 export function disableAllColumns() {
   const columns = document.querySelectorAll(".kanban-column");
+  console.log('columns',columns);
   columns.forEach(column => column.classList.add("disabled-state"));
+  console.log('columns forEach',columns);
 }
 
 export function enableAllColumns() {
@@ -152,3 +154,11 @@ export function enableAllColumns() {
   columns.forEach(column => column.classList.remove("disabled-state"));
 }
 //////
+
+// Отключаем Drag'n'Drop
+/////
+
+export function enbleDragDrop(){
+  const columns = document.querySelectorAll(".kanban-column");
+  columns.forEach(column => column.classList.add("disabled-state"));
+}

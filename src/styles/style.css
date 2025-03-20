@@ -27,10 +27,12 @@
   background-color: rgba(0, 123, 255, 0.1);
 }
 
-.kanban-column.disabled-state .btn-block {
+.kanban-column.disabled-state .btn-block,
+.kanban-column.disabled-state .draggable {
   pointer-events: none; /* Отключаем возможность клика */
   opacity: 0.5; /* Делаем кнопки полупрозрачными */
 }
+
 
 .list-group-item.draggable {
   cursor: grab;

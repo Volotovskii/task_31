@@ -86,6 +86,8 @@ export function logOutUser() {
     const loginForm = document.getElementById("app-login-form");
     if (loginForm) loginForm.classList.remove("d-none"); // Убираем класс d-none
 
+    const userLogin = document.getElementById("user-welcome");
+    userLogin.textContent = ``;
     //areHandlersAttached = false;
 }
 
